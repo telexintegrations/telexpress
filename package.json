@@ -1,7 +1,7 @@
 {
   "name": "telexpress",
   "version": "1.0.0",
-  "description": "A Backend apm for reporting unhandled errors & exceptions to a telex channel",
+  "description": "A lightweight Node.js error monitoring & logging package that sends uncaught exceptions and unhandled rejections to a Telex channel.",
   "exports": {
     "import": "./dist/index.mjs",
     "require": "./dist/index.cjs"
