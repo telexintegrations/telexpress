@@ -19,7 +19,7 @@ export class Logger {
     });
   }
 
-  async log(details: Record<any, any>, event_name: string) {
+  private async log(details: Record<any, any>, event_name: string) {
     let message = '';
 
     for (let key in details) {
