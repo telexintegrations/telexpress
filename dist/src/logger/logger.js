@@ -13,7 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Logger = void 0;
-const axios_1 = __importDefault(require("axios"));
+const worker_threads_1 = require("worker_threads");
+const path_1 = __importDefault(require("path"));
 class Logger {
     constructor(webhook_url, options = {
         handleExceptions: true,
@@ -21,28 +22,24 @@ class Logger {
     }) {
         this.webhook_url = webhook_url;
         this.options = options;
-        this.http = axios_1.default.create({
-            headers: {
-                accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-        });
     }
     log(details, event_name) {
         return __awaiter(this, void 0, void 0, function* () {
-            let message = '';
-            for (let key in details) {
-                message += `${key}: ${details[key]} \n`;
-            }
-            const data = {
+            const worker = new worker_threads_1.Worker(path_1.default.resolve(__dirname, 'worker.js'));
+            worker.on('message', (response) => {
+                if (!response.success) {
+                    console.error(response.message);
+                }
+                console.log(response.message);
+            });
+            worker.on('error', (err) => {
+                console.error(err.message);
+            });
+            worker.postMessage({
+                details,
                 event_name,
-                status: 'error',
-                username: 'Telexpress Logger',
-                message,
-            };
-            const res = yield this.http.post(this.webhook_url, JSON.stringify(data));
-            if (res.status !== 202)
-                console.log(res.data.message);
+                webhook_url: this.webhook_url,
+            });
         });
     }
     initialize() {

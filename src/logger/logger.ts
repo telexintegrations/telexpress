@@ -1,39 +1,35 @@
-import axios, { AxiosInstance } from 'axios';
-import { LoggerOptions } from './interface';
+import { Worker } from 'worker_threads';
+import { LoggerOptions, WorkerResponse } from './interface';
+import path from 'path';
 
 export class Logger {
-  private readonly http: AxiosInstance;
-
   constructor(
     private readonly webhook_url: string,
     private readonly options: LoggerOptions = {
       handleExceptions: true,
       handleRejections: true,
     },
-  ) {
-    this.http = axios.create({
-      headers: {
-        accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
+  ) {}
+
+  private async log(details: Record<string, any>, event_name: string) {
+    const worker = new Worker(path.resolve(__dirname, 'worker.js'));
+
+    worker.on('message', (response: WorkerResponse) => {
+      if (!response.success) {
+        console.error(response.message);
+      }
+      console.log(response.message);
     });
-  }
 
-  private async log(details: Record<any, any>, event_name: string) {
-    let message = '';
+    worker.on('error', (err) => {
+      console.error(err.message);
+    });
 
-    for (let key in details) {
-      message += `${key}: ${details[key]} \n`;
-    }
-    const data = {
+    worker.postMessage({
+      details,
       event_name,
-      status: 'error',
-      username: 'Telexpress Logger',
-      message,
-    };
-    const res = await this.http.post(this.webhook_url, JSON.stringify(data));
-
-    if (res.status !== 202) console.log(res.data.message);
+      webhook_url: this.webhook_url,
+    });
   }
 
   initialize() {
