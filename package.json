@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A lightweight Node.js error monitoring & logging package that sends uncaught exceptions and unhandled rejections to a Telex channel.",
   "exports": {
-    "import": "./dist/index.mjs",
+    "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "main": "./dist/index.cjs",
