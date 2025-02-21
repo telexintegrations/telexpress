@@ -1,6 +1,6 @@
 {
   "name": "telexpress",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lightweight Node.js error monitoring & logging package that sends uncaught exceptions and unhandled rejections to a Telex channel.",
   "exports": {
     "import": "./dist/index.js",
